@@ -1,2 +1,0 @@
-# lightleak
-munge lightleak data

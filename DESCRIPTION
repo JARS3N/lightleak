@@ -1,0 +1,17 @@
+Package: lightleak
+Type: Package
+Title: lightleak
+Version: 0.1.0
+Author: J.Arsenault
+Date: 2017-1002
+Maintainer: Who to complain to <JARS3N@GMAIL.COM>
+Description: working with instrument light leak data
+URL: https://github.com/JARS3N/lightleak
+Imports:
+  readxl,
+  dplyr,
+  tidyr,
+  RMySQL
+License: none
+Encoding: UTF-8
+LazyData: true
