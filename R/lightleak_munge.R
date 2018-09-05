@@ -49,17 +49,29 @@ munge<-function(xlfile){
     whereisA<-which(df[,1]=="A") %>%.[. > CAL ] %>% .[1]
     whereispD<-which(df[,1]=="% Diff") %>% .[. > CAL ] %>% .[1]
 
-      slice(df,(whereisA-1):whereispD) %>%
-      mutate(nchar= nchar(X0)==1) %>%
-      filter(.,nchar==T) %>%
-      select(-nchar) %>%
-      tidyr::gather(.,X0) %>%
-      magrittr::set_names(c("Let","Col","Val")) %>%
-      mutate(Col=gsub("X","",Col) %>% as.numeric()) %>%
-      filter(.,Col<=as.numeric(nofCol(Meta)))%>%
-      mutate(.,Col=sprintf("%02d",Col)) %>%
-      tidyr::unite(.,Well,Let,Col,sep="") %>%
-      mutate(.,Val=as.numeric(Val))
+     # slice(df,(whereisA-1):whereispD) %>%
+      #mutate(nchar= nchar(X0)==1) %>%
+      #filter(.,nchar==T) %>%
+      #select(-nchar) %>%
+      #tidyr::gather(.,X0) %>%
+      #magrittr::set_names(c("Let","Col","Val")) %>%
+      #mutate(Col=gsub("X","",Col) %>% as.numeric()) %>%
+      #filter(.,Col<=as.numeric(nofCol(Meta)))%>%
+      #mutate(.,Col=sprintf("%02d",Col)) %>%
+      #tidyr::unite(.,Well,Let,Col,sep="") %>%
+      #mutate(.,Val=as.numeric(Val))
+    slice(df,(whereisA-1):whereispD) %>% 
+    setNames(.,paste0("X",seq(0,ncol(.)-1))) %>% 
+    filter(.,nchar(X0)>0 ) %>% 
+    filter(.,!grepl("AVG|SD|CV|Diff",X0)) %>% 
+    rename(.,Row=X0) %>% 
+    tidyr::gather(.,'Col','Val',-Row) %>% 
+    mutate(.,) %>% 
+    mutate(Col=gsub("X","",Col) %>% as.numeric()) %>%
+    filter(.,Col<=as.numeric(nofCol(Meta)))%>%
+    mutate(.,Col=sprintf("%02d",Col)) %>% 
+    tidyr::unite(.,Well,Row,Col,sep="") %>% 
+    mutate(.,Val=as.numeric(Val))
   }
 
 
