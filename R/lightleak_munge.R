@@ -81,7 +81,7 @@ munge<-function(xlfile){
   w<-indexAnalyte(XL)
   data<-splitAnalytes(XL,indexAnalyte(XL))
   list(data =
-  do.call('inner_join',
+  Reduce('inner_join',
   list(
     getTable(data$O2,"Emissions") %>%
       rename(O2LL=Val),
