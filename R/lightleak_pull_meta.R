@@ -11,7 +11,7 @@ pull_meta <- function(XL, xlfile) {
     "Num Points:"
   )
   met <-
-    setNames(as.data.frame(lapply(nms, get_term_value, data = XL)), gsub("[ ]|[:]", "", nms))
+    setNames(as.data.frame(lapply(nms, get_term_value, data = XL),stringsAsFactors = FALSE), gsub("[ ]|[:]", "", nms))
   met <- met[, order(names(met))]
   met$file <- xlfile
   met
