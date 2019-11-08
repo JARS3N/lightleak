@@ -1,100 +1,27 @@
 munge<-function(xlfile){
-  require(readxl)
+    require(readxl)
   require(dplyr)
   require(tidyr)
 
-
-  #Pulls the Data from column 2 corresponding to the identifiers in column 1
-  getIT<-function(.data,term,y1=1,y2=2){
-    .data[which(.data[,y1]==term),y2]
-  }
-
-  #Pull all the Meta data from the top of the excel sheet
-  pullMeta<-function(XL,xlfile){
-    c("Light Leak Test","Serial number:","Date:",
-      "Time Start:","Time End:","Final result:",
-      "High Limit Multiplicator:","Low Limit Multiplicator:",
-      "Num Points:"
-    ) %>%
-      assign("nms",.,envir=parent.env(environment())) %>%
-      lapply(.,{. %>% getIT(XL,.)}) %>%
-      unlist %>%
-      data.frame(values=.) %>%
-      mutate(nms=gsub("[ ]|[:]","",nms)) %>%
-      tidyr::spread(.,nms,values) %>%
-      mutate(.,file=basename(xlfile))
-
-  }
-  # find the analytes
-  indexAnalyte<-function(XL){data.frame(i=which(XL[,1]=="Analyte:"),
-                                        a=getIT(XL,"Analyte:")
-  )
-  }
-  # split data on analytes
-  splitAnalytes<-function(XL,w){
-    setNames(
-    list(A =  slice( XL,(w$i[1]-1):(w$i[2]-1)),
-         B =  slice( XL,(w$i[2]-1):(nrow(XL)))
-    ),w$a)
-  }
-  # Using Meta Data subset for correct Number of columns
-  # because data format from Utility is inconsistent
-  nofCol<-function(Meta){
-    x<-substr(Meta$Serialnumber,1,2)
-    list("42"=6,"41"=12,"43"=1,"21"=12)[x]
-  }
-  # Finally Pull the data from each table
-  getTable<-function(df,thing){
-    CAL<-which(df==thing)
-    whereisA<-which(df[,1]=="A") %>%.[. > CAL ] %>% .[1]
-    whereispD<-which(df[,1]=="% Diff") %>% .[. > CAL ] %>% .[1]
-
-     # slice(df,(whereisA-1):whereispD) %>%
-      #mutate(nchar= nchar(X0)==1) %>%
-      #filter(.,nchar==T) %>%
-      #select(-nchar) %>%
-      #tidyr::gather(.,X0) %>%
-      #magrittr::set_names(c("Let","Col","Val")) %>%
-      #mutate(Col=gsub("X","",Col) %>% as.numeric()) %>%
-      #filter(.,Col<=as.numeric(nofCol(Meta)))%>%
-      #mutate(.,Col=sprintf("%02d",Col)) %>%
-      #tidyr::unite(.,Well,Let,Col,sep="") %>%
-      #mutate(.,Val=as.numeric(Val))
-    slice(df,(whereisA-1):whereispD) %>% 
-    setNames(.,paste0("X",seq(0,ncol(.)-1))) %>% 
-    filter(.,nchar(X0)>0 ) %>% 
-    filter(.,!grepl("AVG|SD|CV|Diff",X0)) %>% 
-    rename(.,Row=X0) %>% 
-    tidyr::gather(.,'Col','Val',-Row) %>% 
-    mutate(.,) %>% 
-    mutate(Col=gsub("X","",Col) %>% as.numeric()) %>%
-    filter(.,Col<=as.numeric(nofCol(Meta)))%>%
-    mutate(.,Col=sprintf("%02d",Col)) %>% 
-    tidyr::unite(.,Well,Row,Col,sep="") %>% 
-    mutate(.,Val=as.numeric(Val))
-  }
-
-
-
-  XL<-readxl::read_excel(xlfile,sheet= 'Results',col_names = F) %>% as.data.frame()
-  Meta<-pullMeta(XL,xlfile)
-  w<-indexAnalyte(XL)
-  data<-splitAnalytes(XL,indexAnalyte(XL))
+  XL<- as.data.frame(readxl::read_excel(xlfile,sheet= 'Results',col_names = F),stringsAsFactors=F)
+  Meta<-lightleak::pull_meta(XL,xlfile)
+  w<-lightleak::index_analyte(XL)
+  data<-lightleak::split_analytes(XL,indexAnalyte(XL))
+  NCOL<-lightleak::nofCol(Meta$Serialnumber)
   list(data =
-  Reduce('inner_join',
-  list(
-    getTable(data$O2,"Emissions") %>%
-      rename(O2LL=Val),
-    getTable(data$O2,"Calibration LED") %>%
-      rename(O2LED=Val),
-    getTable(data$pH,"Emissions") %>%
-      rename(pHLL=Val),
-    getTable(data$pH,"Calibration LED") %>%
-      rename(pHLED=Val)
-  )
-    )
-     ,meta = Meta)
-
+         Reduce('inner_join',
+                list(
+                  lightleak::get_table(data$O2,"Emissions",NCOL) %>%
+                    rename(O2LL=Val),
+                  lightleak::get_table(data$O2,"Calibration LED",NCOL) %>%
+                    rename(O2LED=Val),
+                  lightleak::get_table(data$pH,"Emissions",NCOL) %>%
+                    rename(pHLL=Val),
+                  lightleak::get_table(data$pH,"Calibration LED",NCOL) %>%
+                    rename(pHLED=Val)
+                )
+         )
+       ,meta = Meta)
 }
 
 
