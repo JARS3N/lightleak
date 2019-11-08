@@ -1,4 +1,4 @@
-app_ui<-function(){
+app_server<-function(){
 u_inst <- function(conn, PLAT, SLIDE) {
   tbl(conn, 'instqcllmeta') %>%
     select(., Inst = Serialnumber) %>%
