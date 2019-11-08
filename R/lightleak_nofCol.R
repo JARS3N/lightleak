@@ -1,7 +1,7 @@
 # Using Meta Data subset for correct Number of columns
 # because data format from Utility is inconsistent
-nofCol <- function(Meta) {
-  x <- substr(Meta$Serialnumber, 1, 2)
+nofCol <- function(u) {
+  x <- substr(rm_leading_zero(u),1,2)
   list(
     "42" = 6,
     "41" = 12,
