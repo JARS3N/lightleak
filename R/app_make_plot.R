@@ -1,4 +1,4 @@
-app_make_plot <- function(DATA,VAR,ANALYTE,DISTB) {
+app_make_plot <- function(DATA,VAR,ANALYTE,DISTB,CHECK) {
   P <- 
     rename(DATA,B = VAR) %>%
     ggplot(., aes(factor(Serialnumber),B)) +
@@ -12,14 +12,14 @@ app_make_plot <- function(DATA,VAR,ANALYTE,DISTB) {
         "LED" = "LED",
         "perLLTE" = "Light Leak % of TargetEmission",
         "perLLLED" = "Light Leak % of LED"
-      )[input$select]
+      )[VAR]
     ) +
     theme(text = element_text(size = 20),
           axis.text.x = element_text(angle = 90, hjust =
                                        1))
   
   
-  if (input$cktest == TRUE) {
+  if (CHECK == TRUE) {
     switch(
       DISTB,
       "boxplot" = P + geom_boxplot(
