@@ -38,7 +38,7 @@ shinyServer(function(input, output, session) {
       # PLOTS
       output$distPlot <-
         renderPlot({
-          lightleak::app_make_plot(df2, input$select, input$analyte, input$disttype)
+          lightleak::app_make_plot(df2, input$select, input$analyte, input$disttype,input$cktest)
         })# end render plot
       
       
