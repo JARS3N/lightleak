@@ -32,7 +32,7 @@ shinyServer(function(input, output, session) {
     ),
     {
       slides <- c(min(input$SLIDE), max(input$SLIDE))
-      df2 <- app_plot_out(E$ranks, slides, input$plat, my_db, input$analyte)
+      df2 <- app_plot_data(E$ranks, slides, input$plat, my_db, input$analyte)
       
       ##########
       # PLOTS
