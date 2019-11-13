@@ -6,7 +6,7 @@ munge<-function(xlfile){
   XL<- as.data.frame(readxl::read_excel(xlfile,sheet= 'Results',col_names = F),stringsAsFactors=F)
   Meta<-lightleak::pull_meta(XL,xlfile)
   w<-lightleak::index_analyte(XL)
-  data<-lightleak::split_analytes(XL,indexAnalyte(XL))
+  data<-lightleak::split_analytes(XL,w)
   NCOL<-lightleak::nofCol(Meta$Serialnumber)
   list(data =
          Reduce('inner_join',
