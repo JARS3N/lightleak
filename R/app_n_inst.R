@@ -1,11 +1,11 @@
 app_n_inst<- function(DB) {
 require(dplyr)
-  out <- tbl(DB, 'instqcllmeta') %>%
+out <- tbl(DB, "instqcllmeta") %>% 
     select(Serialnumber) %>%
     distinct() %>%
-    mutate(., plat = substr(Serialnumber, 1, 2)) %>%
-    group_by(plat) %>%
-    count() %>%
-    collect() 
+    collect() %>%
+    mutate(., plat = substr(gsub("^00","",Serialnumber), 1, 2)) %>%
+    group_by(plat) %>% 
+    count() 
    setNames(out$n,out$plat)
 }
