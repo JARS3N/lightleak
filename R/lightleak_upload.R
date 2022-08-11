@@ -1,15 +1,14 @@
 
 #### upload LightLeak Data
-upload <- function(LLdat) {
+upload <- function(LLDat) {
   require(RMySQL)
-  my_db <-  adminKraken::con_mysql()
-
-  files_not_in_db <-
-    unlist(lapply(LLdat, file_query_meta, db = my_db)) ==
-    1
-
-  go <- lapply(LLdat[files_not_in_db], process_upload, db)
-
+  upload_per_file <- function(obj, db) {
+    not_in_db <- file_query_meta(obj, db) == 1
+    if (not_in_db) {
+      process_upload(obj, db)
+    }
+  }
+  my_db <- adminKraken::con_mysql()
+  res <- lapply(LLDat, upload_per_file, db = my_db)
   dbDisconnect(my_db)
-  go
 }
